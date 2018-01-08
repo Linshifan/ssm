@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asd.mapper.OrderMapper">
+	
+	<!-- 查询订单状态 -->
+	<select id="findStatus" resultType="int">
+		select status from t_order where oid=#{oid}
+	</select>
+	
+	<!-- 更改订单状态 -->
+	<update id="updateStatus">
+		update t_order set status=#{0} where oid=#{1}
+	</update>
+	
+	<!-- 按oid查询详情 -->
+	<select id="load" resultType="order">
+		select * from t_order where oid=#{oid}
+	</select>
+	
+	<!-- 为指定的order加载所有的orderItem -->
+	<select id="loadOrderItem" resultMap="getorderitems">
+		select * from t_orderitem where oid=#{oid}
+	</select>
+	
+	<resultMap type="orderitems" id="getorderitems">
+		<id column="orderItemId" property="orderItemId"/>
+		<result column="quantity" property="quantity"/>
+		<result column="subtotal" property="subtotal"/>
+		<result column="bid" property="bid"/>
+		<result column="bname" property="bname"/>
+		<result column="currPrice" property="currPrice"/>
+		<result column="image_b" property="image_b"/>
+		<result column="oid" property="oid"/>
+	</resultMap>
+	
+	<!-- 生成订单order -->
+	<insert id="addOrder">
+		insert into t_order values(#{0},#{1},#{2},#{3},#{4},#{5})
+	</insert>
+	
+	<!-- 生成子单orderitem -->
+	<insert id="addOrderitem" parameterType="java.util.List">
+		insert into t_orderitem(orderItemId,quantity,subtotal,bid,bname,currPrice,image_b,oid) values
+			<foreach collection="list" item="item" index="index" separator=",">
+				 (#{item.orderItemId},#{item.quantity},#{item.subtotal},#{item.book.bid},#{item.book.bname},#{item.book.currPrice},#{item.book.image_b},#{item.order.oid})
+			</foreach>
+	</insert>
+	
+	<!-- 查询所有订单 -->
+	<select id="findAll" resultMap="getorders">
+		select * from t_order
+	</select>
+	
+	<!-- 查询所有订单分页 -->
+	<select id="findAlls" resultMap="getorders">
+		select * from t_order order by ordertime desc limit #{0},#{1}
+	</select>
+	
+	<!-- 按用户查询所有订单 -->
+	<select id="findByUser" resultMap="getorders">
+		select * from t_order where uid=#{0} order by ordertime desc limit #{1},#{2}
+	</select>
+	
+	<!-- 按状态查询所有订单 -->
+	<select id="findByStatus" resultMap="getorders">
+		select * from t_order where status=#{0} order by ordertime desc limit #{1},#{2}
+	</select>
+	
+	<!-- 按用户查询所有订单 -->
+	<select id="findByUsers" resultMap="getorders">
+		select * from t_order where uid=#{uid} 
+	</select>
+	
+	<!-- 按状态查询所有订单 -->
+	<select id="findByStatuss" resultMap="getorders">
+		select * from t_order where status=#{status}
+	</select>
+	
+	<resultMap type="order" id="getorders">
+		<id column="oid" property="oid"/>
+		<result column="ordertime" property="ordertime"/>
+		<result column="total" property="total"/>
+		<result column="status" property="status"/>
+		<result column="address" property="address"/>
+		<association property="user" javaType="user">
+			<id column="uid" property="uid"/>
+		</association>
+	</resultMap>
+</mapper>

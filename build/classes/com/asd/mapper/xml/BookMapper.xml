@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asd.mapper.BookMapper">
+		
+		<!-- 图书模块 => 删除图书 -->
+		<delete id="delete" parameterType="string">
+				delete from t_book where bid=#{bid}
+		</delete>
+		
+		<!-- 修改图书 -->
+		<update id="edit" parameterType="book">
+				update t_book set bname=#{bname},place=#{place},price=#{price},currPrice=#{currPrice},discount=#{discount},press=#{press},publishtime=#{publishtime},edition=#{edition},
+				 <!--pageNum=#{pageNum},wordNum=#{wordNum},printtime=#{printtime},booksize=#{booksize},paper=#{paper},-->
+				cid=#{cid} where bid=#{bid}
+		</update>
+		
+		<!-- 查询指定分类下的图书数量 -->
+		<select id="findBookCountByCategory" parameterType="string" resultType="int">
+				select count(*) from t_book where cid=#{cid}
+		</select>
+		
+		<!-- 增加图书 -->
+		<insert id="add" parameterType="book" >
+			insert into t_book(bid,bname,place,price,currPrice,discount,press,publishtime,edition,<!--,pageNum,wordNum,printtime,booksize,paper,-->cid,image_w,image_b) values(#{bid},#{bname},#{place},#{price},#{currPrice},#{discount},#{press},#{publishtime},#{edition},<!-- #{pageNum},#{wordNum},#{printtime},#{booksize},#{paper},-->#{cid},#{image_w},#{image_b})
+		</insert>
+		
+		<!-- 按book的bid查询,这是一个俩表查询 -->
+		<select id="findByBid" resultType="bookpid">
+			select * from t_book b,s_category c where b.cid=c.cid and b.bid=#{bid}
+		</select>
+		
+		<!-- 按分类查询 -->
+		<select id="findByCategory" resultMap="getList">
+			select * from t_book where cid=#{0} order by orderBy limit #{1},#{2}
+		</select>
+		
+		<!-- 模糊查询 -->
+		<select id="findByBname" resultMap="getList">
+			select * from t_book where bname like #{0} order by orderBy limit #{1},#{2}
+		</select>
+		
+		<!-- 按作者查询 -->
+		<select id="findByPlace" resultMap="getList">
+			select * from t_book where place like #{0} order by orderBy limit #{1},#{2}
+		</select>
+		
+		<!-- 按出版社查询 -->
+		<select id="findByPress" resultMap="getList">
+			select * from t_book where press like #{0} order by orderBy limit #{1},#{2}
+		</select>
+		
+		<!-- 多条件查询 -->
+		<select id="findByCombination" resultMap="getList">
+			select * from t_book where bname like #{0} and place like #{1} and press like #{2} order by orderBy limit #{3},#{4}
+		</select>
+		
+		<!-- 按分类查询 -->
+		<select id="findByCategorys" resultMap="getList">
+			select * from t_book where cid=#{cid}
+		</select>
+		
+		<!-- 模糊查询 -->
+		<select id="findByBnames" resultMap="getList">
+			select * from t_book where bname like #{bname}
+		</select>
+		
+		<!-- 按作者查询 -->
+		<select id="findByPlaces" resultMap="getList">
+			select * from t_book where place  like #{place}
+		</select>
+		
+		<!-- 按出版社查询 -->
+		<select id="findByPresss" resultMap="getList">
+			select * from t_book where press like #{press}
+		</select>
+		
+		<!-- 多条件查询 -->
+		<select id="findByCombinations" resultMap="getList">
+			select * from t_book where bname like #{0} and place like #{1} and press like #{2}
+		</select>
+		
+		<resultMap type="book" id="getList">
+			<id column="bid" property="bid"/>
+			<result column="bname" property="bname"/>
+			<result column="place" property="place"/>
+			<result column="price" property="price"/>
+			<result column="currPrice" property="currPrice"/>
+			<result column="discount" property="discount"/>
+			<result column="press" property="press"/>
+			<result column="publishtime" property="publishtime"/>
+	    	<result column="edition" property="edition"/>
+		<!--<result column="pageNum" property="pageNum"/>
+			<result column="wordNum" property="wordNum"/>
+			<result column="printtime" property="printtime"/>
+			<result column="booksize" property="booksize"/>
+			<result column="paper" property="paper"/>-->
+			<result column="image_w" property="image_w"/>
+			<result column="image_b" property="image_b"/>
+		</resultMap>
+		
+</mapper>

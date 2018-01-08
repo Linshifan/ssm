@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asd.mapper.CartItemMapper">
+		
+		<!-- 通过用户查找购物车 -->
+		<select id="findByUser" resultMap="getList">
+			select * from s_cartitem c,t_book b where c.bid = b.bid and uid=#{uid} order by c.orderBy
+		</select>
+		
+		
+		<resultMap type="cartitem" id="getList">
+			<id column="cartItemId" property="cartItemId"/>
+			<result column="quantity" property="quantity"/>
+			<association property="user" javaType="user">
+				<id property="uid" column="uid"/>
+			</association>
+			<association property="book" javaType="book">
+				<id column="bid" property="bid"/>
+				<result column="bname" property="bname"/>
+				<result column="author" property="author"/>
+				<result column="price" property="price"/>
+				<result column="currPrice" property="currPrice"/>
+				<result column="discount" property="discount"/>
+				<result column="press" property="press"/>
+				<result column="publishtime" property="publishtime"/>
+				<result column="edition" property="edition"/>
+				<result column="pageNum" property="pageNum"/>
+				<result column="wordNum" property="wordNum"/>
+				<result column="printtime" property="printtime"/>
+				<result column="booksize" property="booksize"/>
+				<result column="paper" property="paper"/>
+				<result column="image_w" property="image_w"/>
+				<result column="image_b" property="image_b"/>
+			</association>
+		</resultMap>
+		
+		<!-- 通过uid和bid产找cartitem -->
+		<select id="findByUidAndBid" resultType="cartitem">
+			select * from s_cartitem where uid=#{0} and bid=#{1}
+		</select>
+		
+		<!-- 根据购物条目数量修改 -->
+		<update id="updateQuantity">
+			update s_cartitem  set quantity=#{0} where cartItemId=#{1} 
+		</update>
+		
+		<!-- 按cartItemId查找 -->
+		<select id="findByCartItemId" resultMap="getList">
+			select * from s_cartitem c,t_book b where c.bid=b.bid and c.cartItemId=#{cartItemId}
+		</select>
+		
+		<!-- 增加cartItem的数量 -->
+		<insert id="addCartItem" >
+			insert into s_cartitem(cartItemId,quantity,bid,uid) values(#{0},#{1},#{2},#{3})
+		</insert>
+		
+		<!-- 批量删除 -->
+		<delete id="batchDelete" parameterType="java.util.List">
+			<![CDATA[
+				delete from s_cartitem where cartItemId in
+			]]>
+			<foreach collection="list" item="model" open="(" separator="," close=")">
+				#{model}
+			</foreach>
+		</delete>
+		
+		<!-- 批量加载 -->
+		<select id="loadCartItems" resultMap="getList" parameterType="java.util.List">
+			<![CDATA[
+				select * from s_cartitem c,t_book b where c.bid=b.bid and cartItemId in
+			]]>
+			<foreach collection="list" item="model" open="(" separator="," close=")">
+				#{model}
+			</foreach>
+		</select>
+		
+		
+		
+		
+</mapper>
